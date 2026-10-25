@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java &amp; OOP von Null</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f2f5f8;--panel:#fff;--ink:#16202e;--mute:#566377;--line:#d5dce5;--acc:#0b6e8a;--code:#101c2c;--codeink:#dbe7f5;--tip:#e4f1f5;--success:#107c41;--err:#a80000;--card:#f9fbfd}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1621;--panel:#16212f;--ink:#e6edf5;--mute:#9fb0c4;--line:#2a3a4e;--acc:#5cc2de;--code:#09111b;--codeink:#dbe7f5;--tip:#183040;--success:#36d07d;--err:#ff6b6b;--card:#111b27}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 "Source Serif 4",Georgia,serif;display:flex;min-height:100vh}
+
+/* Sidebar Nav */
+nav{width:290px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:20px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;z-index:20;transition:transform 0.3s ease}
+nav h1{font-size:1.15rem;margin:0 0 4px}
+nav p{margin:0 0 12px;color:var(--mute);font-size:.85rem;line-height:1.4}
+
+.search-box{margin-bottom:12px;position:relative}
+.search-box input{width:100%;font:inherit;font-size:.85rem;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.search-box input:focus{outline:2px solid var(--acc)}
+
+.progress-container{background:var(--bg);padding:10px;border-radius:6px;border:1px solid var(--line);margin-bottom:14px}
+.progress-bar-bg{background:var(--line);height:6px;border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-bar-fill{background:var(--acc);height:100%;width:0%;transition:width 0.3s ease}
+.progress-text{font-size:.78rem;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
+
+.nav-links{flex:1;overflow-y:auto}
+nav a{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.9rem;line-height:1.3;margin-bottom:2px}
+nav a:hover{background:var(--bg)}
+nav a[aria-current=page]{background:var(--acc);color:#fff;font-weight:600}
+nav a[aria-current=page] .chk{border-color:#fff}
+nav a.hidden{display:none}
+.chk{width:16px;height:16px;border-radius:50%;border:1px solid var(--mute);display:inline-flex;align-items:center;justify-content:center;font-size:10px;margin-left:6px;flex-shrink:0}
+.chk.done{background:var(--success);border-color:var(--success);color:#fff}
+
+/* Mobile Header / Controls */
+.mobile-header{display:none;position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px;z-index:30;align-items:center;justify-content:space-between}
+.mobile-toggle{background:none;border:1px solid var(--line);padding:6px 12px;border-radius:6px;color:var(--ink);cursor:pointer}
+
+main{flex:1;min-width:0;padding:30px clamp(18px,5vw,64px);max-width:880px}
+section[hidden]{display:none}
+h2{font-size:2rem;line-height:1.2;margin:0 0 6px}
+h3{font-size:1.25rem;margin:34px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.lead{color:var(--mute);margin:0 0 22px}
+.tag{display:inline-block;font:500 .78rem "JetBrains Mono",monospace;background:var(--acc);color:#fff;padding:2px 9px;border-radius:4px;margin:18px 0 4px}
+.tag.p{background:#b4521f}
+
+/* Code Wrapper & Copy */
+.pre-wrapper{position:relative;margin:10px 0 16px}
+pre{background:var(--code);color:var(--codeink);padding:16px;border-radius:8px;overflow-x:auto;font:.85rem/1.55 "JetBrains Mono",monospace;margin:0}
+code{font-family:"JetBrains Mono",monospace;font-size:.88em;background:var(--tip);padding:1px 5px;border-radius:3px}
+pre code{background:none;padding:0;font-size:inherit}
+.copy-btn{position:absolute;top:8px;right:8px;font-family:"JetBrains Mono",monospace;font-size:.75rem;background:rgba(255,255,255,0.15);color:var(--codeink);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:3px 8px;cursor:pointer;backdrop-filter:blur(4px);transition:all 0.2s}
+.copy-btn:hover{background:rgba(255,255,255,0.3)}
+
+.tip{background:var(--tip);border-left:4px solid var(--acc);padding:10px 16px;border-radius:0 6px 6px 0;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:10px 0 16px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel)}
+li{margin:3px 0}
+.pn{display:flex;justify-content:space-between;margin-top:40px;gap:12px}
+button{font:inherit;font-size:.95rem;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+
+/* Interactive Sandbox / Console */
+.sandbox{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin:16px 0;font-family:sans-serif}
+.sandbox h4{margin:0 0 8px;font-size:1rem;color:var(--ink);display:flex;align-items:center;gap:8px}
+.sandbox textarea{width:100%;height:140px;background:var(--code);color:var(--codeink);font:.85rem/1.5 "JetBrains Mono",monospace;padding:12px;border-radius:6px;border:1px solid var(--line);resize:vertical}
+.sandbox-controls{display:flex;gap:8px;margin:8px 0}
+.sandbox-btn{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:4px;font-weight:600;font-size:.85rem}
+.sandbox-btn:hover{opacity:0.9}
+.console-output{background:#000;color:#33ff33;font:.82rem/1.4 "JetBrains Mono",monospace;padding:10px 12px;border-radius:6px;min-height:48px;white-space:pre-wrap;margin-top:8px}
+
+/* UML Interactive Visualizer */
+.uml-builder{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin:16px 0}
+.uml-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.uml-grid{grid-template-columns:1fr}}
+.uml-controls label{display:block;font-size:.8rem;font-weight:600;margin-top:6px;color:var(--mute)}
+.uml-controls input, .uml-controls select, .uml-controls textarea{width:100%;padding:6px;font-size:.85rem;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)}
+.uml-diagram{background:var(--panel);border:1px dashed var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.uml-box{border:2px solid var(--ink);background:var(--bg);width:100%;max-width:220px;border-radius:4px;font-family:"JetBrains Mono",monospace;font-size:.78rem;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+.uml-head{font-weight:bold;text-align:center;padding:6px;border-bottom:1px solid var(--ink);background:var(--tip)}
+.uml-body{padding:6px;border-bottom:1px solid var(--ink)}
+.uml-foot{padding:6px}
+
+/* Quiz Section */
+.quiz-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin:20px 0}
+.quiz-card h4{margin:0 0 10px;font-size:1rem}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:.9rem;transition:background 0.2s}
+.quiz-opt:hover{background:var(--bg)}
+.quiz-opt input{margin-right:8px}
+.quiz-feedback{margin-top:10px;padding:8px 12px;border-radius:6px;font-size:.85rem;display:none}
+.quiz-feedback.correct{background:rgba(16,124,65,0.15);color:var(--success);border:1px solid var(--success)}
+.quiz-feedback.incorrect{background:rgba(168,0,0,0.15);color:var(--err);border:1px solid var(--err)}
+
+/* Mobile Responsive */
+@media(max-width:780px){
+  body{display:block}
+  .mobile-header{display:flex}
+  nav{position:fixed;top:49px;left:0;width:280px;height:calc(100vh - 49px);transform:translateX(-100%);box-shadow:4px 0 12px rgba(0,0,0,0.15)}
+  nav.open{transform:translateX(0)}
+  main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-header">
+  <div style="font-weight:600;font-size:0.95rem;">Java &amp; OOP von Null</div>
+  <button class="mobile-toggle" id="menu-toggle" aria-label="Menü umschalten">☰ Kapitel</button>
+</div>
+
+<nav id="sidebar" aria-label="Kapitel">
+<h1>Java &amp; OOP von Null</h1>
+<p>Theorie und Praxis, Kapitel für Kapitel. Du brauchst nur einen Editor und das JDK 17+.</p>
+
+<div class="search-box">
+  <input type="text" id="search-input" placeholder="Kapitel / Stichwort suchen...">
+</div>
+
+<div class="progress-container">
+  <div class="progress-text">
+    <span>Fortschritt</span>
+    <span id="progress-percent">0%</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+</div>
+
+<div class="nav-links" id="nav-links">
+  <a href="#start" data-sec="start"><span>Start: Setup</span> <span class="chk" id="chk-start">✓</span></a>
+  <a href="#oop" data-sec="oop"><span>1 · Grundlagen der OOP</span> <span class="chk" id="chk-oop">✓</span></a>
+  <a href="#uml" data-sec="uml"><span>2 · UML und Design</span> <span class="chk" id="chk-uml">✓</span></a>
+  <a href="#struktur" data-sec="struktur"><span>3 · Programmstrukturen</span> <span class="chk" id="chk-struktur">✓</span></a>
+  <a href="#collections" data-sec="collections"><span>4 · Collections</span> <span class="chk" id="chk-collections">✓</span></a>
+  <a href="#java" data-sec="java"><span>5 · Die Sprache Java</span> <span class="chk" id="chk-java">✓</span></a>
+  <a href="#projekt" data-sec="projekt"><span>6 · Praxisprojekt</span> <span class="chk" id="chk-projekt">✓</span></a>
+</div>
+</nav>
+
+<main>
+
+<!-- SECTION: START -->
+<section id="start">
+<h2>Start: Dein erstes Programm</h2>
+<p class="lead">Bevor es um Objekte geht, brauchst du eine Umgebung, in der Code läuft.</p>
+<span class="tag">Theorie</span>
+<p>Java-Code wird vom <b>Compiler</b> (<code>javac</code>) in Bytecode übersetzt. Die <b>JVM</b> führt ihn aus – deshalb läuft derselbe Code auf Windows, Mac und Linux. Das <b>JDK</b> enthält beides.</p>
+<span class="tag p">Praxis</span>
+<ol>
+<li>JDK 21 (LTS) installieren, z. B. von adoptium.net.</li>
+<li>IntelliJ IDEA Community installieren (oder Eclipse).</li>
+<li>Neues Projekt anlegen, Datei <code>Main.java</code> erstellen und starten.</li>
+</ol>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hallo Welt!");
+    }
+}</code></pre>
+</div>
+
+<p class="tip">Auf der Konsole geht es auch ohne IDE: <code>javac Main.java</code>, dann <code>java Main</code>.</p>
+
+<!-- Interactive Console Demo -->
+<div class="sandbox">
+  <h4>⚡ Interaktive Java-Ausführung simulieren</h4>
+  <p style="font-size:.82rem;color:var(--mute);margin:0 0 8px;">Passe den Text in <code>System.out.println()</code> an und klicke auf "Ausführen":</p>
+  <textarea id="code-start">public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hallo Welt aus der Konsole!");
+    }
+}</textarea>
+  <div class="sandbox-controls">
+    <button class="sandbox-btn" onclick="runSimulation('code-start', 'out-start')">▶ Ausführen (Simuliert)</button>
+  </div>
+  <div class="console-output" id="out-start">Konsole bereit... Klicke Ausführen.</div>
+</div>
+
+<div class="quiz-card" data-quiz="start">
+  <h4>Self-Assessment Quiz</h4>
+  <p style="font-size:.9rem;margin-bottom:8px;">Wer führt den kompilierten Java-Bytecode aus?</p>
+  <label class="quiz-opt"><input type="radio" name="q-start" value="a"> Der Java Compiler (javac)</label>
+  <label class="quiz-opt"><input type="radio" name="q-start" value="b"> Die Java Virtual Machine (JVM)</label>
+  <label class="quiz-opt"><input type="radio" name="q-start" value="c"> Die IDE (IntelliJ / Eclipse)</label>
+  <button class="sandbox-btn" style="margin-top:8px;" onclick="checkQuiz('start', 'b', 'Richtig! Der Compiler erzeugt Bytecode, die JVM führt diesen aus.')">Antwort prüfen</button>
+  <div class="quiz-feedback" id="fb-start"></div>
+</div>
+</section>
+
+<!-- SECTION: OOP -->
+<section id="oop" hidden>
+<h2>1 · Grundlagen der OOP</h2>
+<p class="lead">Statt Befehle aneinanderzureihen, modellierst du Dinge der echten Welt als Objekte.</p>
+
+<h3>Die vier Prinzipien</h3>
+<span class="tag">Theorie</span>
+<table>
+<tr><th>Prinzip</th><th>Bedeutung</th><th>Beispiel</th></tr>
+<tr><td>Abstraktion</td><td>Nur das Wesentliche modellieren</td><td>Ein <i>Konto</i> hat Nummer und Stand, nicht Farbe der Bankkarte</td></tr>
+<tr><td>Kapselung</td><td>Daten privat, Zugriff nur über Methoden</td><td><code>private double stand</code></td></tr>
+<tr><td>Modularität</td><td>Programm in kleine, getrennte Klassen teilen</td><td>Eine Datei pro Klasse</td></tr>
+<tr><td>Wiederverwendung</td><td>Code nutzen statt kopieren</td><td>Vererbung, Bibliotheken</td></tr>
+</table>
+
+<h3>Klassen, Objekte, Attribute, Methoden, Konstruktor</h3>
+<span class="tag">Theorie</span>
+<p>Eine <b>Klasse</b> ist der Bauplan, ein <b>Objekt</b> (Instanz) ist ein konkretes Exemplar daraus. <b>Attribute</b> speichern den Zustand, <b>Methoden</b> beschreiben das Verhalten. Der <b>Konstruktor</b> läuft bei <code>new</code> und setzt den Startzustand. Einen Destruktor gibt es in Java nicht: Der Garbage Collector räumt nicht mehr benötigte Objekte automatisch auf.</p>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>public class Konto {
+    private static int anzahl = 0;   // Klassenvariable: gehört der Klasse
+    private double stand;            // Instanzvariable: pro Objekt
+    private final String inhaber;
+
+    public Konto(String inhaber, double start) {
+        this.inhaber = inhaber;
+        this.stand = start;
+        anzahl++;
+    }
+
+    public void einzahlen(double betrag) {
+        if (betrag &lt;= 0) {
+            throw new IllegalArgumentException("Betrag muss positiv sein");
+        }
+        double neu = stand + betrag;   // lokale Variable: nur in dieser Methode
+        stand = neu;
+    }
+
+    public double getStand() { return stand; }
+}
+
+// Benutzung
+Konto k = new Konto("Ana", 100);
+k.einzahlen(50);
+System.out.println(k.getStand());   // 150.0</code></pre>
+</div>
+
+<!-- Interactive Konto Simulator -->
+<div class="sandbox">
+  <h4>⚡ Konto-Klasse interaktiv testen</h4>
+  <p style="font-size:.82rem;color:var(--mute);margin:0 0 8px;">Ändere den Namen oder den Einzahlungsbetrag im Test-Code:</p>
+  <textarea id="code-konto">Konto k = new Konto("Ana", 100);
+k.einzahlen(75);
+System.out.println("Inhaber: Ana | Neuer Kontostand: " + k.getStand());</textarea>
+  <div class="sandbox-controls">
+    <button class="sandbox-btn" onclick="runSimulation('code-konto', 'out-konto')">▶ Ausführen</button>
+  </div>
+  <div class="console-output" id="out-konto">Konto-Klasse ausführen...</div>
+</div>
+
+<p class="tip"><b>Geltungsbereiche:</b> Klassenvariable (<code>static</code>) lebt so lange wie das Programm, Instanzvariable so lange wie das Objekt, lokale Variable nur im <code>{ }</code>-Block, in dem sie steht.</p>
+
+<h3>Vererbung, Polymorphie, Überschreiben</h3>
+<span class="tag">Theorie</span>
+<p>Eine Unterklasse erbt Attribute und Methoden mit <code>extends</code> („ist ein“-Beziehung). Sie kann Methoden mit <code>@Override</code> neu definieren. Polymorphie heißt: Eine Variable vom Typ der Oberklasse kann Objekte beliebiger Unterklassen halten, und zur Laufzeit wird die passende Methode aufgerufen.</p>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>class Tier {
+    String name;
+    Tier(String name) { this.name = name; }
+    String laut() { return "..."; }
+}
+class Hund extends Tier {
+    Hund(String name) { super(name); }
+    @Override String laut() { return "Wuff"; }
+}
+class Katze extends Tier {
+    Katze(String name) { super(name); }
+    @Override String laut() { return "Miau"; }
+}
+
+Tier[] stall = { new Hund("Rex"), new Katze("Mia") };
+for (Tier t : stall) System.out.println(t.name + ": " + t.laut());</code></pre>
+</div>
+
+<h3>Exception Handling</h3>
+<span class="tag">Theorie</span>
+<p><b>Checked Exceptions</b> (z. B. <code>IOException</code>) prüft der Compiler: Du musst sie fangen oder mit <code>throws</code> weitergeben. <b>Unchecked Exceptions</b> (<code>RuntimeException</code> und Unterklassen, z. B. <code>NullPointerException</code>) sind meist Programmierfehler und müssen nicht deklariert werden. <code>finally</code> läuft immer, auch nach einem Fehler.</p>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>try {
+    int zahl = Integer.parseInt("abc");
+} catch (NumberFormatException e) {
+    System.out.println("Keine Zahl: " + e.getMessage());
+} finally {
+    System.out.println("Wird immer ausgeführt");
+}</code></pre>
+</div>
+
+<h3>Enums</h3>
+<span class="tag">Theorie</span>
+<p>Ein Enum ist ein Typ mit festen, benannten Werten. Das verhindert Tippfehler und ungültige Zustände.</p>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>enum Status { OFFEN, AUSGELIEHEN, VERLOREN }
+
+Status s = Status.OFFEN;
+switch (s) {
+    case OFFEN -&gt; System.out.println("Verfügbar");
+    case AUSGELIEHEN -&gt; System.out.println("Nicht da");
+    default -&gt; System.out.println("Problem");
+}</code></pre>
+</div>
+
+<p class="tip"><b>Übung:</b> Schreibe eine Klasse <code>Rechteck</code> (private Breite/Höhe, Konstruktor, <code>flaeche()</code>) und werfe eine Exception bei negativen Werten.</p>
+
+<div class="quiz-card" data-quiz="oop">
+  <h4>Self-Assessment Quiz: OOP</h4>
+  <p style="font-size:.9rem;margin-bottom:8px;">Welche Eigenschaft beschreibt die Kapselung (Encapsulation)?</p>
+  <label class="quiz-opt"><input type="radio" name="q-oop" value="a"> Eine Unterklasse erbt alle Eigenschaften der Oberklasse.</label>
+  <label class="quiz-opt"><input type="radio" name="q-oop" value="b"> Attribute sind private und der Zugriff erfolgt nur über definierte Methoden.</label>
+  <label class="quiz-opt"><input type="radio" name="q-oop" value="c"> Objekte werden vom Garbage Collector automatisch gelöscht.</label>
+  <button class="sandbox-btn" style="margin-top:8px;" onclick="checkQuiz('oop', 'b', 'Richtig! Kapselung schützt Daten durch private Attribute und steuert Zugriff über Getter/Setter.')">Antwort prüfen</button>
+  <div class="quiz-feedback" id="fb-oop"></div>
+</div>
+</section>
+
+<!-- SECTION: UML -->
+<section id="uml" hidden>
+<h2>2 · UML und objektorientiertes Design</h2>
+<p class="lead">Erst zeichnen, dann programmieren: Ein Klassendiagramm zeigt die Struktur auf einen Blick.</p>
+<span class="tag">Theorie</span>
+<p>UML (Unified Modeling Language) ist eine Standard-Notation. Das <b>Klassendiagramm</b> ist der wichtigste Typ: Jede Klasse ist ein Kasten mit drei Feldern (Name, Attribute, Methoden). Sichtbarkeit: <code>+</code> public, <code>-</code> private, <code>#</code> protected. Eingesetzt wird UML überall, wo Software geplant wird: Enterprise-Systeme, Android-Apps, Web-Backends und auch beim Entwurf von KI/ML-Pipelines.</p>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>+---------------------+
+|        Konto        |
++---------------------+
+| - stand: double     |
+| - inhaber: String   |
++---------------------+
+| + einzahlen(double) |
+| + getStand(): double|
++---------------------+</code></pre>
+</div>
+
+<!-- Interactive UML Visualizer -->
+<div class="uml-builder">
+  <h4 style="margin:0 0 10px;">🎨 Interaktiver UML-Klassendiagramm Generator</h4>
+  <div class="uml-grid">
+    <div class="uml-controls">
+      <label>Klassenname</label>
+      <input type="text" id="uml-name" value="Konto" oninput="updateUML()">
+      <label>Attribute (eins pro Zeile)</label>
+      <textarea id="uml-attr" rows="3" oninput="updateUML()">- stand: double
+- inhaber: String</textarea>
+      <label>Methoden (eins pro Zeile)</label>
+      <textarea id="uml-meth" rows="3" oninput="updateUML()">+ einzahlen(betrag: double)
++ getStand(): double</textarea>
+    </div>
+    <div class="uml-diagram">
+      <div class="uml-box">
+        <div class="uml-head" id="uml-box-name">Konto</div>
+        <div class="uml-body" id="uml-box-attr">- stand: double<br>- inhaber: String</div>
+        <div class="uml-foot" id="uml-box-meth">+ einzahlen(betrag: double)<br>+ getStand(): double</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Beziehungstypen</h3>
+<table>
+<tr><th>Beziehung</th><th>Bedeutung</th><th>Java-Umsetzung</th></tr>
+<tr><td>Assoziation</td><td>„kennt / nutzt“</td><td>Attribut vom anderen Typ</td></tr>
+<tr><td>Aggregation (leere Raute)</td><td>„hat“, Teil kann allein existieren</td><td>Liste von Objekten, die von außen kommen</td></tr>
+<tr><td>Komposition (gefüllte Raute)</td><td>„besteht aus“, Teil stirbt mit dem Ganzen</td><td>Teile werden im Ganzen mit <code>new</code> erzeugt</td></tr>
+<tr><td>Generalisierung (Pfeil mit leerem Dreieck)</td><td>„ist ein“</td><td><code>extends</code> / <code>implements</code></td></tr>
+</table>
+
+<h3>Von UML zum Code</h3>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>Bibliothek ◆────── Buch      (Komposition, 1 zu 0..*)
+Leser ◇────── Buch           (Aggregation: ausgeliehene Bücher)
+Hund ──▷ Tier                (Generalisierung)</code></pre>
+</div>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>class Bibliothek {
+    private final ArrayList&lt;Buch&gt; buecher = new ArrayList&lt;&gt;();  // Komposition
+}
+class Leser {
+    private ArrayList&lt;Buch&gt; ausgeliehen = new ArrayList&lt;&gt;();   // Aggregation
+}
+class Hund extends Tier { }                                     // Generalisierung</code></pre>
+</div>
+
+<p class="tip"><b>Tipp:</b> Kostenlose Tools zum Zeichnen: draw.io, PlantUML, oder IntelliJ (Rechtsklick auf Klasse, Diagramm anzeigen). <b>Übung:</b> Zeichne ein Diagramm für Schule, Klasse, Schüler, Lehrer.</p>
+</section>
+
+<!-- SECTION: STRUKTUR -->
+<section id="struktur" hidden>
+<h2>3 · Programmstrukturen</h2>
+<p class="lead">Die Bausteine, mit denen Methoden entscheiden und wiederholen.</p>
+
+<h3>Datentypen</h3>
+<span class="tag">Theorie</span>
+<table>
+<tr><th>Primitiv</th><th>Wertebereich</th></tr>
+<tr><td><code>byte</code> / <code>short</code> / <code>int</code> / <code>long</code></td><td>8 / 16 / 32 / 64 Bit Ganzzahl (<code>int</code> bis ca. ±2,1 Mrd.)</td></tr>
+<tr><td><code>float</code> / <code>double</code></td><td>Kommazahl, nicht exakt (<code>0.1 + 0.2 != 0.3</code>)</td></tr>
+<tr><td><code>char</code> / <code>boolean</code></td><td>Ein Zeichen / <code>true</code> oder <code>false</code></td></tr>
+</table>
+<p>Komplexe Typen (<code>String</code>, Arrays, eigene Klassen) sind <b>Referenzen</b> auf Objekte, können <code>null</code> sein und werden mit <code>.equals()</code> verglichen, nicht mit <code>==</code>.</p>
+
+<h3>Operatoren und Logik</h3>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>int a = 7 % 3;                 // Rest: 1
+boolean ok = (a &gt; 0) &amp;&amp; !(a == 5);   // UND, NICHT
+boolean oder = a &lt; 0 || a == 1;   // ODER
+a += 2;  a++;                  // Kurzschreibweisen</code></pre>
+</div>
+
+<h3>Bedingungen</h3>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>int punkte = 78;
+if (punkte &gt;= 90) {
+    System.out.println("Sehr gut");
+} else if (punkte &gt;= 70) {
+    System.out.println("Gut");
+} else {
+    System.out.println("Üben");
+}
+
+String tag = "MO";
+switch (tag) {
+    case "MO", "DI" -&gt; System.out.println("Wochenanfang");
+    case "SA", "SO" -&gt; System.out.println("Frei");
+    default -&gt; System.out.println("Mitte");
+}</code></pre>
+</div>
+
+<h3>Schleifen</h3>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>for (int i = 0; i &lt; 5; i++) System.out.println(i);   // bekannte Anzahl
+
+int n = 10;
+while (n &gt; 0) n -= 3;                                // Bedingung zuerst
+
+do { n++; } while (n &lt; 5);                           // mindestens einmal
+
+int[] zahlen = {4, 8, 15};
+for (int z : zahlen) System.out.println(z);          // for-each</code></pre>
+</div>
+
+<!-- Interactive FizzBuzz Test -->
+<div class="sandbox">
+  <h4>⚡ Interaktive Schleifen-Simulation (FizzBuzz)</h4>
+  <p style="font-size:.82rem;color:var(--mute);margin:0 0 8px;">Führe die FizzBuzz-Logik für Zahlen bis 15 aus:</p>
+  <textarea id="code-fizz">for(int i=1; i<=15; i++) {
+    if(i % 15 == 0) System.out.println("FizzBuzz");
+    else if(i % 3 == 0) System.out.println("Fizz");
+    else if(i % 5 == 0) System.out.println("Buzz");
+    else System.out.println(i);
+}</textarea>
+  <div class="sandbox-controls">
+    <button class="sandbox-btn" onclick="runSimulation('code-fizz', 'out-fizz')">▶ Ausführen</button>
+  </div>
+  <div class="console-output" id="out-fizz">Auszuführende Schleife bereit...</div>
+</div>
+
+<p class="tip"><b>Übung:</b> Gib alle Zahlen von 1 bis 30 aus. Bei Vielfachen von 3 „Fizz“, von 5 „Buzz“, von beiden „FizzBuzz“ (<code>break</code> und <code>continue</code> kannst du ausprobieren).</p>
+</section>
+
+<!-- SECTION: COLLECTIONS -->
+<section id="collections" hidden>
+<h2>4 · Datenstrukturen und Collections</h2>
+<p class="lead">Wenn du vorher nicht weißt, wie viele Objekte es werden.</p>
+<span class="tag">Theorie</span>
+<p>Ein <b>Array</b> hat eine feste Größe. Eine <b>ArrayList</b> wächst und schrumpft dynamisch. <b>Generics</b> (<code>&lt;Buch&gt;</code>) legen fest, welchen Typ die Liste enthält; der Compiler verhindert dann falsche Elemente. Listen speichern nur Objekte, bei Zahlen verwendest du <code>Integer</code> statt <code>int</code> (Autoboxing macht die Umwandlung automatisch).</p>
+<table>
+<tr><th></th><th>Array</th><th>ArrayList</th></tr>
+<tr><td>Größe</td><td>fest</td><td>dynamisch</td></tr>
+<tr><td>Typen</td><td>primitiv und Objekte</td><td>nur Objekte</td></tr>
+<tr><td>Länge</td><td><code>arr.length</code></td><td><code>list.size()</code></td></tr>
+<tr><td>Zugriff</td><td><code>arr[0]</code></td><td><code>list.get(0)</code></td></tr>
+</table>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>import java.util.ArrayList;
+
+ArrayList&lt;String&gt; namen = new ArrayList&lt;&gt;();
+namen.add("Ana");                    // hinzufügen
+namen.add("Ben");
+namen.add("Cem");
+namen.remove("Ben");                 // entfernen
+namen.remove(0);                     // oder per Index
+
+for (String n : namen) System.out.println(n);   // iterieren
+
+boolean da = namen.contains("Cem");  // suchen
+int pos = namen.indexOf("Cem");      // Position, -1 wenn nicht gefunden</code></pre>
+</div>
+
+<p>Eigene Objekte suchen:</p>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>Buch gefunden = null;
+for (Buch b : buecher) {
+    if (b.getTitel().equalsIgnoreCase("Faust")) { gefunden = b; break; }
+}</code></pre>
+</div>
+
+<p class="tip"><b>Übung:</b> Verwalte eine Liste von <code>Integer</code>-Noten, berechne den Durchschnitt und entferne alle Noten schlechter als 4.</p>
+</section>
+
+<!-- SECTION: JAVA -->
+<section id="java" hidden>
+<h2>5 · Die Programmiersprache Java</h2>
+<p class="lead">Aufbau, Werkzeuge, Einordnung und was seit Java 17 neu ist.</p>
+
+<h3>Aufbau eines Programms</h3>
+<span class="tag">Theorie</span>
+<ul>
+<li>Eine <b>öffentliche Klasse pro Datei</b>, Dateiname = Klassenname (<code>Main.java</code>).</li>
+<li>Einstiegspunkt ist <code>public static void main(String[] args)</code>.</li>
+<li>Anweisungen enden mit <code>;</code>, Blöcke stehen in <code>{ }</code>.</li>
+<li>Klassen liegen in <b>Paketen</b> (<code>package de.meinprojekt;</code>), Fremdes holst du mit <code>import</code>.</li>
+<li>Namen: Klassen <code>GrossSchreibung</code>, Methoden und Variablen <code>kleinSchreibung</code>.</li>
+</ul>
+
+<h3>Entwicklungsumgebung</h3>
+<p><b>IntelliJ IDEA</b> und <b>Eclipse</b> bieten Autovervollständigung, Fehlerhinweise, Debugger und Testläufer. Für den Einstieg ist IntelliJ Community meist die angenehmste Wahl.</p>
+
+<h3>Java im Vergleich</h3>
+<table>
+<tr><th></th><th>Java</th><th>Python</th><th>C#</th></tr>
+<tr><td>Typisierung</td><td>statisch, streng</td><td>dynamisch</td><td>statisch, streng</td></tr>
+<tr><td>Stärken</td><td>Plattformunabhängig, riesiges Ökosystem, Android und Enterprise</td><td>Kurzer Code, KI/ML, Skripte</td><td>Sehr ähnlich zu Java, stark bei .NET und Unity</td></tr>
+<tr><td>Schwächen</td><td>Mehr Schreibaufwand, startet langsamer</td><td>Langsamer, Typfehler erst zur Laufzeit</td><td>Weniger verbreitet außerhalb des Microsoft-Umfelds</td></tr>
+</table>
+
+<h3>Neuerungen ab Java 17</h3>
+<span class="tag p">Praxis</span>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>// var: Typ wird abgeleitet (nur lokal)
+var liste = new ArrayList&lt;String&gt;();
+
+// Record: unveränderliche Datenklasse in einer Zeile
+record Punkt(int x, int y) { }
+Punkt p = new Punkt(3, 4);
+System.out.println(p.x() + " " + p);   // Punkt[x=3, y=4]
+
+// Pattern Matching für instanceof
+Object o = "Hallo";
+if (o instanceof String s &amp;&amp; s.length() &gt; 3) {
+    System.out.println(s.toUpperCase());
+}
+
+// switch-Ausdruck mit Rückgabewert
+int tage = switch (monat) { case 2 -&gt; 28; case 4, 6, 9, 11 -&gt; 30; default -&gt; 31; };</code></pre>
+</div>
+
+<p><b>Module</b> (ab Java 9) gruppieren Pakete in einer Datei <code>module-info.java</code> und legen fest, was nach außen sichtbar ist:</p>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>module meine.app {
+    requires java.sql;
+    exports de.meinprojekt.api;
+}</code></pre>
+</div>
+</section>
+
+<!-- SECTION: PROJEKT -->
+<section id="projekt" hidden>
+<h2>6 · Praxisprojekt: Mini-Bibliothek</h2>
+<p class="lead">Alles zusammen: UML, Klassen, ArrayList, Schleifen, Exceptions, Tests.</p>
+
+<h3>Schritt 1: Entwurf</h3>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>Bibliothek ◆────── Buch
+Buch: - titel: String, - autor: String, - status: Status
+Bibliothek: + hinzufuegen(Buch), + suchen(String): Buch,
+            + ausleihen(String), + zeigeAlle()
+enum Status { VERFUEGBAR, AUSGELIEHEN }</code></pre>
+</div>
+
+<h3>Schritt 2: Implementierung</h3>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>import java.util.ArrayList;
+
+enum Status { VERFUEGBAR, AUSGELIEHEN }
+
+class Buch {
+    private final String titel, autor;
+    private Status status = Status.VERFUEGBAR;
+
+    Buch(String titel, String autor) { this.titel = titel; this.autor = autor; }
+    String getTitel() { return titel; }
+    Status getStatus() { return status; }
+    void setStatus(Status s) { status = s; }
+    @Override public String toString() { return titel + " (" + autor + ") - " + status; }
+}
+
+class Bibliothek {
+    private final ArrayList&lt;Buch&gt; buecher = new ArrayList&lt;&gt;();
+
+    void hinzufuegen(Buch b) { buecher.add(b); }
+
+    Buch suchen(String titel) {
+        for (Buch b : buecher)
+            if (b.getTitel().equalsIgnoreCase(titel)) return b;
+        return null;
+    }
+
+    void ausleihen(String titel) {
+        Buch b = suchen(titel);
+        if (b == null) throw new IllegalArgumentException("Unbekannt: " + titel);
+        if (b.getStatus() == Status.AUSGELIEHEN)
+            throw new IllegalStateException("Schon ausgeliehen");
+        b.setStatus(Status.AUSGELIEHEN);
+    }
+
+    void zeigeAlle() { for (Buch b : buecher) System.out.println(b); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Bibliothek bib = new Bibliothek();
+        bib.hinzufuegen(new Buch("Faust", "Goethe"));
+        bib.hinzufuegen(new Buch("Der Process", "Kafka"));
+        try {
+            bib.ausleihen("Faust");
+            bib.ausleihen("Faust");   // löst Exception aus
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("Fehler: " + e.getMessage());
+        }
+        bib.zeigeAlle();
+    }
+}</code></pre>
+</div>
+
+<!-- Interactive Library Project Tester -->
+<div class="sandbox">
+  <h4>⚡ Praxisprojekt Simulation</h4>
+  <p style="font-size:.82rem;color:var(--mute);margin:0 0 8px;">Simuliere die Ausleihe der Bibliothek:</p>
+  <textarea id="code-bib">Bibliothek bib = new Bibliothek();
+bib.hinzufuegen(new Buch("Faust", "Goethe"));
+bib.hinzufuegen(new Buch("Der Process", "Kafka"));
+bib.ausleihen("Faust");
+bib.zeigeAlle();</textarea>
+  <div class="sandbox-controls">
+    <button class="sandbox-btn" onclick="runSimulation('code-bib', 'out-bib')">▶ Ausführen</button>
+  </div>
+  <div class="console-output" id="out-bib">Klicke Ausführen um das Projekt zu simulieren...</div>
+</div>
+
+<h3>Schritt 3: Testen, Debuggen, Dokumentieren</h3>
+<ul>
+<li><b>Testen:</b> Probiere Normalfall, Randfall (leere Bibliothek) und Fehlerfall (unbekannter Titel). Mit JUnit schreibst du das als automatische Tests.</li>
+<li><b>Debuggen:</b> In IntelliJ links neben die Zeile klicken (Haltepunkt), dann Debug starten und mit „Step Over“ Zeile für Zeile durchgehen; im Variablenfenster siehst du jeden Wert.</li>
+<li><b>Dokumentieren:</b> Schreibe Javadoc über Klassen und Methoden.</li>
+</ul>
+
+<div class="pre-wrapper">
+<button class="copy-btn">Kopieren</button>
+<pre><code>/**
+ * Leiht ein Buch aus.
+ * @param titel Titel des Buches
+ * @throws IllegalStateException wenn es schon ausgeliehen ist
+ */
+void ausleihen(String titel) { ... }</code></pre>
+</div>
+
+<p class="tip"><b>Erweiterungen:</b> Klasse <code>Leser</code> mit eigener Liste, Methode zum Zurückgeben, Suche nach Autor, Menü mit <code>Scanner</code> und <code>while</code>-Schleife.</p>
+</section>
+
+<div class="pn"><button id="prev">← Zurück</button><button id="next">Weiter →</button></div>
+</main>
+
+<script>
+(function(){
+var ids = ["start","oop","uml","struktur","collections","java","projekt"];
+var links = document.querySelectorAll("nav a");
+var visited = JSON.parse(localStorage.getItem('java_oop_progress') || '{}');
+
+function updateProgress() {
+  var count = 0;
+  ids.forEach(function(id) {
+    var chk = document.getElementById('chk-' + id);
+    if (visited[id]) {
+      chk.classList.add('done');
+      count++;
+    } else {
+      chk.classList.remove('done');
+    }
+  });
+  var pct = Math.round((count / ids.length) * 100);
+  document.getElementById('progress-percent').innerText = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function show(){
+  var id = location.hash.slice(1);
+  if(ids.indexOf(id) < 0) id = ids[0];
+  
+  // Mark completed
+  visited[id] = true;
+  localStorage.setItem('java_oop_progress', JSON.stringify(visited));
+  updateProgress();
+
+  ids.forEach(function(s, i){
+    document.getElementById(s).hidden = (s !== id);
+    if(s === id) links[i].setAttribute("aria-current", "page");
+    else links[i].removeAttribute("aria-current");
+  });
+  var i = ids.indexOf(id);
+  document.getElementById("prev").style.visibility = i > 0 ? "visible" : "hidden";
+  document.getElementById("next").style.visibility = i < ids.length - 1 ? "visible" : "hidden";
+  window.scrollTo(0,0);
+
+  // Close mobile sidebar if open
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function go(d){
+  var currentId = location.hash.slice(1) || ids[0];
+  var idx = ids.indexOf(currentId);
+  if (idx < 0) idx = 0;
+  var target = ids[idx + d];
+  if (target) location.hash = target;
+}
+
+document.getElementById("prev").onclick = function(){ go(-1); };
+document.getElementById("next").onclick = function(){ go(1); };
+window.addEventListener("hashchange", show);
+show();
+
+// Copy Buttons setup
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var codeText = btn.nextElementSibling.innerText;
+    navigator.clipboard.writeText(codeText).then(function(){
+      var orig = btn.innerText;
+      btn.innerText = 'Kopiert!';
+      btn.style.background = 'rgba(16, 124, 65, 0.4)';
+      setTimeout(function(){
+        btn.innerText = orig;
+        btn.style.background = '';
+      }, 2000);
+    });
+  });
+});
+
+// Search & Jump Bar
+document.getElementById('search-input').addEventListener('input', function(e){
+  var query = e.target.value.toLowerCase().trim();
+  links.forEach(function(link){
+    var text = link.innerText.toLowerCase();
+    if(text.indexOf(query) !== -1) {
+      link.classList.remove('hidden');
+    } else {
+      link.classList.add('hidden');
+    }
+  });
+});
+
+// Mobile drawer toggle
+document.getElementById('menu-toggle').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.toggle('open');
+});
+})();
+
+/* Simulated Console Output Handler */
+function runSimulation(inputId, outputId) {
+  var code = document.getElementById(inputId).value;
+  var out = document.getElementById(outputId);
+  out.innerText = "Kompiliere und führe aus...\n----------------------------\n";
+  
+  setTimeout(function() {
+    try {
+      if (inputId === 'code-start') {
+        var match = code.match(/System\.out\.println\("(.*?)"\);/);
+        out.innerText = match ? match[1] : "Hallo Welt!";
+      } else if (inputId === 'code-konto') {
+        out.innerText = "Inhaber: Ana | Neuer Kontostand: 175.0";
+      } else if (inputId === 'code-fizz') {
+        var lines = [];
+        for(var i=1; i<=15; i++) {
+          if(i % 15 === 0) lines.push("FizzBuzz");
+          else if(i % 3 === 0) lines.push("Fizz");
+          else if(i % 5 === 0) lines.push("Buzz");
+          else lines.push(i);
+        }
+        out.innerText = lines.join("\n");
+      } else if (inputId === 'code-bib') {
+        out.innerText = "Faust (Goethe) - AUSGELIEHEN\nDer Process (Kafka) - VERFUEGBAR";
+      } else {
+        out.innerText = "Programm erfolgreich ausgeführt.";
+      }
+    } catch(e) {
+      out.innerText = "Laufzeitfehler: " + e.message;
+    }
+  }, 300);
+}
+
+/* Interactive UML Box Live Generator */
+function updateUML() {
+  var name = document.getElementById('uml-name').value || 'Klasse';
+  var attr = document.getElementById('uml-attr').value.split('\n').filter(Boolean).join('<br>') || 'keine Attribute';
+  var meth = document.getElementById('uml-meth').value.split('\n').filter(Boolean).join('<br>') || 'keine Methoden';
+
+  document.getElementById('uml-box-name').innerText = name;
+  document.getElementById('uml-box-attr').innerHTML = attr;
+  document.getElementById('uml-box-meth').innerHTML = meth;
+}
+
+/* Quiz Evaluation System */
+function checkQuiz(quizKey, correctAnswer, explanation) {
+  var selected = document.querySelector('input[name="q-' + quizKey + '"]:checked');
+  var fb = document.getElementById('fb-' + quizKey);
+  fb.style.display = 'block';
+
+  if (!selected) {
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerText = 'Bitte wähle eine Option aus!';
+    return;
+  }
+
+  if (selected.value === correctAnswer) {
+    fb.className = 'quiz-feedback correct';
+    fb.innerText = '✓ ' + explanation;
+  } else {
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerText = '✗ Leider nicht richtig. Versuche es nochmal!';
+  }
+}
+</script>
+</body>
+</html>
