@@ -43,7 +43,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--ac);outline-offset:
 .mermaid{background:#fff;border-radius:8px;padding:10px;margin-top:10px;overflow-x:auto}
 @media(max-width:800px){body{display:block}aside{width:auto;height:auto;position:static}}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
-</style>
+.ana{background:#2a2410;border-left:4px solid var(--ac);padding:10px 14px;border-radius:0 8px 8px 0;margin:8px 0}.err{background:#3a1d1d;border-left:4px solid var(--bad);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:10px}th{white-space:nowrap}</style>
 </head>
 <body>
 <aside>
@@ -56,50 +56,121 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--ac);outline-offset:
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script>
 var P=[
-{t:"Grundlagen der OOP",i:"Objekte statt Befehlsketten: Abstraktion (nur Wesentliches), Kapselung (Daten privat), Modularität (kleine Klassen), Wiederverwendung (Vererbung).",
+{t:"Grundlagen der OOP",i:"Wir gehen langsam vor. Jedes Thema beginnt mit einem Alltagsbild, dann folgen die Wörter in einfacher Sprache, dann der Code Zeile für Zeile. Klick bei jedem Beispiel auf „Ausführen“.",
 T:[
-{h:"Klassen, Objekte, Konstruktor, Geltungsbereiche",x:"Die <b>Klasse</b> ist der Bauplan, das <b>Objekt</b> eine Instanz. <b>Attribute</b> speichern Zustand, <b>Methoden</b> das Verhalten. Der <b>Konstruktor</b> läuft bei <code>new</code>. Einen Destruktor gibt es nicht, der Garbage Collector räumt auf. <b>Klassenvariable</b> (<code>static</code>): einmal pro Klasse. <b>Instanzvariable</b>: pro Objekt. <b>Lokale Variable</b>: nur im Block.",
-c:`public class Konto {
-    static int anzahl = 0;        // Klassenvariable
-    private double stand;         // Instanzvariable
-    Konto(double start) { stand = start; anzahl++; }
-    void einzahlen(double b) {
-        if (b <= 0) throw new IllegalArgumentException("Betrag > 0");
-        double neu = stand + b;   // lokale Variable
-        stand = neu;
-    }
-    double getStand() { return stand; }
-    public static void main(String[] a) {
-        Konto k = new Konto(100);
-        k.einzahlen(50);
-        System.out.println(k.getStand() + " / Konten: " + anzahl);
-    }
-}`,o:"150.0 / Konten: 1"},
-{h:"Vererbung, Polymorphie, Überschreiben",x:"<code>extends</code> bedeutet „ist ein“. Mit <code>@Override</code> ersetzt die Unterklasse eine Methode. Eine Variable der Oberklasse kann jede Unterklasse halten, aufgerufen wird die passende Methode (Polymorphie).",
-c:`class Tier { String laut() { return "..."; } }
-class Hund extends Tier { @Override String laut() { return "Wuff"; } }
-class Katze extends Tier { @Override String laut() { return "Miau"; } }
+{h:"Die Grundidee: alles besteht aus Objekten",a:"Stell dir Lego vor. Jeder Stein ist klein und einfach, aber aus vielen Steinen baust du ein Schloss. OOP heißt: Du zerlegst ein großes Programm in kleine Bausteine, die Objekte heißen.",
+x:"Ein <b>Programm</b> ist eine Liste von Anweisungen für den Computer. <b>Code</b> ist der Text, in dem du sie schreibst. Bei OOP schreibst du nicht eine lange Liste, sondern viele kleine Dinge, die jeweils ihre eigenen Daten und Fähigkeiten haben. Dahinter stehen vier Leitideen:<ul><li><b>Abstraktion:</b> Eine Landkarte zeigt Straßen, aber keine Blätter an den Bäumen. Du modellierst nur, was wichtig ist.</li><li><b>Kapselung:</b> Bei der Kaffeemaschine drückst du einen Knopf, das Innenleben siehst du nicht. Daten bleiben versteckt, man nutzt sie nur über Knöpfe (Methoden).</li><li><b>Modularität:</b> Eine Wohnung hat getrennte Zimmer. Jede Klasse hat ihre eigene Aufgabe.</li><li><b>Wiederverwendung:</b> Ein Rezept kochst du oft. Einmal geschriebenen Code nutzt du immer wieder.</li></ul>",
+w:[["Programm","Anweisungen für den Computer"],["Code","der Text, den du schreibst"],["Objekt","ein Ding im Programm, mit Daten und Fähigkeiten"],["OOP","objektorientierte Programmierung: Programmieren mit Objekten"]],
+e:"Viele Anfänger denken „OOP ist kompliziert“. Es ist nur eine Art, Dinge zu ordnen, so wie du auch deinen Schrank sortierst."},
 
-Tier[] stall = { new Hund(), new Katze(), new Tier() };
-for (Tier t : stall) System.out.println(t.laut());`,o:"Wuff\nMiau\n..."},
-{h:"Exception Handling",x:"<b>Checked</b> (z. B. <code>IOException</code>): Compiler erzwingt <code>try/catch</code> oder <code>throws</code>. <b>Unchecked</b> (<code>RuntimeException</code>): meist Programmierfehler. <code>finally</code> läuft immer.",
+{h:"Klasse, Objekt, Attribut, Methode",a:"Eine Klasse ist die Kuchenform, das Objekt ist der Kuchen. Mit einer Form backst du viele Kuchen. Jeder darf anders verziert sein, aber alle haben dieselbe Form. Attribute sind die Eigenschaften eines Autos (Farbe), Methoden seine Fähigkeiten (fahren).",
+x:"Die <b>Klasse</b> beschreibt, wie etwas aussieht und was es kann. Erst mit <code>new</code> entsteht ein echtes <b>Objekt</b> (auch <b>Instanz</b> genannt). Lies den Punkt als „von“: <code>meinAuto.farbe</code> heißt „die Farbe von meinAuto“.",
+w:[["class","Schlüsselwort: „Hier beginnt ein Bauplan“"],["Attribut","Variable in der Klasse, speichert eine Eigenschaft"],["Methode","Block mit Anweisungen, eine Fähigkeit"],["new","baue ein echtes Objekt nach dem Bauplan"],["String","Text, z. B. \"rot\""],["int","ganze Zahl, z. B. 10"],["void","„gibt nichts zurück“"],["main","hier startet das Programm"]],
+c:`public class Auto {                // Bauplan mit dem Namen Auto
+    String farbe;                  // Attribut: Text
+    int geschwindigkeit;           // Attribut: ganze Zahl
+
+    void gasGeben() {              // Methode: Fähigkeit
+        geschwindigkeit = geschwindigkeit + 10;
+    }
+
+    public static void main(String[] args) {
+        Auto meinAuto = new Auto();    // echtes Auto bauen
+        meinAuto.farbe = "rot";        // Farbe festlegen
+        meinAuto.gasGeben();           // Fähigkeit benutzen
+        System.out.println(meinAuto.farbe + " " + meinAuto.geschwindigkeit);
+    }
+}`,o:"rot 10",
+e:"Vergisst du new, gibt es kein Auto, sondern nur einen leeren Platzhalter (null). Das Programm stürzt dann mit einer NullPointerException ab."},
+
+{h:"Konstruktor und Destruktor",a:"Der Konstruktor ist wie ein Bestellformular beim Autokauf: Du musst Farbe und Modell angeben, bevor das Auto gebaut wird. Einen Destruktor gibt es in Java nicht. Stattdessen holt eine Müllabfuhr (Garbage Collector) Objekte ab, die niemand mehr braucht.",
+x:"Der <b>Konstruktor</b> ist eine besondere Methode. Er heißt genau wie die Klasse und läuft automatisch bei <code>new</code>. So hat jedes Objekt von Anfang an sinnvolle Werte.",
+w:[["this","„dieses Objekt hier“. this.name ist das Attribut, name allein der mitgegebene Wert"],["Parameter","Wert, den du einer Methode oder einem Konstruktor übergibst"],["Garbage Collector","Java räumt nicht mehr genutzte Objekte automatisch auf"]],
+c:`class Haustier {
+    String name;
+    int alter;
+
+    Haustier(String name, int alter) {   // Konstruktor
+        this.name = name;                // Wert ins Attribut kopieren
+        this.alter = alter;
+    }
+
+    public static void main(String[] args) {
+        Haustier h = new Haustier("Luna", 3);
+        System.out.println(h.name + " ist " + h.alter);
+    }
+}`,o:"Luna ist 3",
+e:"Ein Konstruktor hat keinen Rückgabetyp, auch kein void, und muss genau wie die Klasse heißen (gleiche Groß- und Kleinschreibung)."},
+
+{h:"Geltungsbereiche: wer sieht welche Variable?",a:"Denk an einen Wohnblock. Der Hausflur gehört allen (Klassenvariable). Jede Wohnung gehört einer Familie (Instanzvariable). Der Notizzettel auf deinem Schreibtisch gilt nur für den Moment (lokale Variable).",
+x:"<b>Klassenvariable</b> (<code>static</code>): gibt es nur einmal, egal wie viele Objekte existieren. <b>Instanzvariable</b>: jedes Objekt hat seine eigene. <b>Lokale Variable</b>: lebt nur in den geschweiften Klammern <code>{ }</code>, in denen sie steht.",
+w:[["static","gehört zur Klasse, nicht zu einem einzelnen Objekt"],["Block","alles zwischen { und }"],["++","um 1 erhöhen"]],
+c:`class Spieler {
+    static int anzahl = 0;        // Hausflur: einmal für alle
+    String name;                  // Wohnung: pro Spieler eigen
+
+    Spieler(String name) {
+        this.name = name;
+        anzahl++;                 // bei jedem neuen Spieler +1
+    }
+    void zeige() {
+        String text = "Spieler: " + name;   // Notizzettel: nur hier
+        System.out.println(text);
+    }
+    public static void main(String[] args) {
+        new Spieler("Ana").zeige();
+        new Spieler("Ben").zeige();
+        System.out.println("Anzahl: " + anzahl);
+    }
+}`,o:"Spieler: Ana\nSpieler: Ben\nAnzahl: 2",
+e:"Benutzt du text außerhalb der Methode zeige, meldet der Compiler „cannot find symbol“. Die Variable gibt es dort nicht."},
+
+{h:"Vererbung, Polymorphie, Überschreiben",a:"In einer Familie erben Kinder Eigenschaften der Eltern, dürfen aber eigene Fähigkeiten haben. Beispiel: Fahrzeug ist der Elternteil, Fahrrad und Auto sind Kinder. Sagst du „Fahrzeug, fahr los!“, fährt jedes auf seine eigene Art. Das ist Polymorphie, auf Deutsch Vielgestaltigkeit.",
+x:"Mit <code>extends</code> sagt eine Klasse: „Ich bin eine Art von …“. Sie bekommt alles von der Oberklasse geschenkt und kann einzelne Methoden mit <code>@Override</code> durch ihre eigene Version <b>überschreiben</b>.",
+w:[["Oberklasse","die Eltern, hier Fahrzeug"],["Unterklasse","das Kind, hier Fahrrad oder Auto"],["extends","„erbt von“"],["@Override","Hinweis: „Ich ersetze absichtlich die Methode der Eltern“"],["Polymorphie","gleicher Aufruf, je nach Objekt anderes Verhalten"]],
+c:`class Fahrzeug {
+    void fahren() { System.out.println("Fahrzeug rollt"); }
+}
+class Fahrrad extends Fahrzeug {
+    @Override void fahren() { System.out.println("Pedale treten"); }
+}
+class Auto extends Fahrzeug {
+    @Override void fahren() { System.out.println("Motor brummt"); }
+}
+// im main:
+Fahrzeug[] liste = { new Fahrrad(), new Auto() };
+for (Fahrzeug f : liste) f.fahren();   // jedes fährt auf seine Art`,o:"Pedale treten\nMotor brummt",
+e:"Wenn du @Override vergisst und dich im Methodennamen vertippst, entsteht still eine neue Methode. Mit @Override meldet der Compiler den Fehler sofort."},
+
+{h:"Exception Handling: Fehler abfangen",a:"Im Zirkus hängt unter dem Akrobaten ein Netz. Fällt er, fängt es ihn auf und die Show geht weiter. try ist das Kunststück, catch das Netz, finally der Abschluss, der immer kommt.",
+x:"Eine <b>Exception</b> ist ein Fehler zur Laufzeit. <b>Checked Exceptions</b> (z. B. Datei fehlt) sind wie eine Wetterwarnung: Der Compiler zwingt dich, dich vorzubereiten. <b>Unchecked Exceptions</b> (z. B. Division durch 0) sind Überraschungen, meist Programmierfehler, und müssen nicht deklariert werden.",
+w:[["try","„Versuche das“"],["catch","„Wenn dieser Fehler passiert, tu das“"],["finally","läuft immer, mit oder ohne Fehler"],["throw","einen Fehler absichtlich auslösen"]],
 c:`try {
-    Integer.parseInt("abc");
+    int zahl = Integer.parseInt("abc");   // "abc" ist keine Zahl
+    System.out.println("Das wird übersprungen");
 } catch (NumberFormatException e) {
-    System.out.println("Fehler: " + e.getMessage());
+    System.out.println("Das war keine Zahl!");
 } finally {
-    System.out.println("Aufräumen");
-}`,o:'Fehler: For input string: "abc"\nAufräumen'},
-{h:"Enums",x:"Ein Enum ist ein Typ mit festen Werten. Das verhindert Tippfehler und ungültige Zustände in der Programmlogik.",
-c:`enum Status { OFFEN, AUSGELIEHEN }
-Status s = Status.AUSGELIEHEN;
-switch (s) {
-    case OFFEN -> System.out.println("frei");
-    case AUSGELIEHEN -> System.out.println("weg");
-}`,o:"weg"}],
-Q:[{q:"Was bedeutet Kapselung?",o:["Daten privat, Zugriff über Methoden","Eine Klasse erbt von einer anderen","Code in Dateien aufteilen"],a:0},
-{q:"Welche Exception muss der Compiler erzwingen?",o:["NullPointerException","IOException","ArithmeticException"],a:1},
-{q:"Was gibt Polymorphie bei Tier t = new Hund(); t.laut() zurück?",o:["Den Text der Klasse Tier","Den Text der Klasse Hund","Einen Fehler"],a:1}]},
+    System.out.println("Immer am Ende");
+}`,o:"Das war keine Zahl!\nImmer am Ende",
+e:"Ein leeres catch ({ }) versteckt Fehler. Gib immer etwas aus, damit du siehst, was schiefging."},
+
+{h:"Enums: feste Auswahllisten",a:"Eine Ampel kennt nur ROT, GELB und GRÜN. Keine andere Farbe ist erlaubt. Genau das macht ein Enum: Es legt fest, welche Werte möglich sind.",
+x:"Ein <b>Enum</b> (Aufzählung) ist ein eigener Typ mit einer festen Liste von Werten. Das verhindert Tippfehler wie „rooot“ und macht <code>switch</code> sehr übersichtlich.",
+w:[["enum","Schlüsselwort für eine Aufzählung"],["switch","wählt je nach Wert einen Fall aus"],["->","„dann tue“"]],
+c:`enum Ampel { ROT, GELB, GRUEN }
+
+Ampel jetzt = Ampel.ROT;
+switch (jetzt) {
+    case ROT   -> System.out.println("Stehen bleiben");
+    case GELB  -> System.out.println("Achtung");
+    case GRUEN -> System.out.println("Gehen");
+}`,o:"Stehen bleiben",
+e:"Enum-Werte schreibt man genau so, wie sie definiert sind. Ampel.Rot funktioniert nicht, nur Ampel.ROT."}],
+Q:[{q:"Was ist der Unterschied zwischen Klasse und Objekt?",o:["Klasse = Kuchenform, Objekt = der gebackene Kuchen","Beides ist dasselbe","Objekt = Bauplan, Klasse = Kuchen"],a:0},
+{q:"Was macht das Schlüsselwort new?",o:["Löscht ein Objekt","Baut ein echtes Objekt aus dem Bauplan","Startet das Programm"],a:1},
+{q:"Was bedeutet extends?",o:["„erbt von“","„ist größer als“","„importiert“"],a:0},
+{q:"Wann läuft der finally-Block?",o:["Nur wenn ein Fehler passiert","Nur wenn alles klappt","Immer"],a:2}]},
 
 {t:"UML und Design",i:"Erst zeichnen, dann programmieren. Das Klassendiagramm zeigt Klassen (Name, Attribute, Methoden) und ihre Beziehungen. Einsatz: Enterprise, Android-Apps, Web-Backends, KI/ML-Pipelines.",
 T:[
@@ -207,12 +278,12 @@ function cur(){var m=/^#p(\d+)/.exec(location.hash);var i=m?+m[1]-1:0;return i>=
 function render(){var i=cur(),p=P[i],m=$("m");m.innerHTML="";
 m.appendChild(mk("h2",null,(i+1)+". "+p.t));m.appendChild(mk("p","lead",p.i));
 p.T.forEach(function(t){var c=mk("section","card");c.appendChild(mk("h3",null,t.h));
-var d=mk("div");d.innerHTML=t.x;c.appendChild(d);
+if(t.a){var an=mk("div","ana");an.innerHTML="<b>💡 Alltagsbild:</b> "+t.a;c.appendChild(an)}var d=mk("div");d.innerHTML=t.x;c.appendChild(d);if(t.w){c.appendChild(mk("p",null,"📖 Wörter erklärt:"));var tb=mk("table");t.w.forEach(function(r){var tr=mk("tr");tr.appendChild(mk("th",null,r[0]));tr.appendChild(mk("td",null,r[1]));tb.appendChild(tr)});c.appendChild(tb)}
 if(t.d){var g=mk("pre","mermaid",t.d);c.appendChild(g)}
 if(t.c){c.appendChild(mk("pre",null,t.c));
 if(t.o){var o=mk("pre","out",t.o);o.hidden=true;var b=mk("button","run","▶ Ausführen");
 b.onclick=function(){o.hidden=!o.hidden;b.textContent=o.hidden?"▶ Ausführen":"■ Ausgabe ausblenden"};c.appendChild(b);c.appendChild(o)}}
-m.appendChild(c)});
+if(t.e){var er=mk("div","err");er.textContent="⚠️ Typischer Fehler: "+t.e;c.appendChild(er)}m.appendChild(c)});
 var qc=mk("section","card");qc.appendChild(mk("h3",null,"Quiz"));
 p.Q.forEach(function(q){var w=mk("div","q");w.appendChild(mk("p",null,q.q));
 q.o.forEach(function(t,k){var b=mk("button",null,t);b.onclick=function(){
